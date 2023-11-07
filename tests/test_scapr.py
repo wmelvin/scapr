@@ -8,7 +8,7 @@ def test_version():
     assert isinstance(version, str), "Version should be a string"
 
 
-def test_capture_to_output_dir(tmp_path):
+def test_capture_to_output_dir(tmp_path, monkeypatch):
     out_path = tmp_path / "output"
     out_path.mkdir()
     assert out_path.exists(), "Output folder should exist"
@@ -22,5 +22,6 @@ def test_capture_to_output_dir(tmp_path):
         "--seconds",
         "1",
     ]
-    scapr.scap.main(args)
+    monkeypatch.setattr("sys.argv", args)    
+    scapr.scap.main()
     assert 2 == len(list(out_path.glob("*.jpg"))), "Should have two files"

@@ -11,7 +11,7 @@ from PIL import ImageGrab
 
 app_version = "231107.1"
 
-pub_version = "0.1.dev2"
+pub_version = "0.1.dev3"
 
 app_title = (
     "scapr - Screen Capture utility - version "
@@ -131,10 +131,10 @@ def get_opts(argv):
     return opts
 
 
-def main(argv):
+def main():
     print(f"\n{app_title}")
 
-    opts = get_opts(argv)
+    opts = get_opts(sys.argv)
 
     print('  Run "scap.py -h" (or --help) to see available options.\n')
 
@@ -182,4 +182,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main())

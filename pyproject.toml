@@ -13,6 +13,9 @@ keywords = ["image", "screen capture", "screen shot", "screenshot"]
 requires-python = ">=3.7"
 dependencies = ["pillow"]
 
+[project.scripts]
+scapr = "scapr:scap.main"
+
 [project.urls]
 Home = "https://github.com/wmelvin/scapr"
 
