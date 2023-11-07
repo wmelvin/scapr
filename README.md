@@ -1,5 +1,7 @@
 # scapr
 
+![PyPI - Version](https://img.shields.io/pypi/v/scapr)
+
 ## Screen Capture in Python
 
 A script that uses Pillow's ImageGrab to capture screenshots.
@@ -29,3 +31,4 @@ options:
 Pillow - [ImageGrab](https://pillow.readthedocs.io/en/stable/reference/ImageGrab.html)
 
 Python - [KeyboardInterrupt](https://docs.python.org/3/library/exceptions.html#KeyboardInterrupt)
+
