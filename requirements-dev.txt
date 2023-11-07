@@ -1,0 +1,5 @@
+flit
+pillow
+pytest
+#ruff
+#tox
