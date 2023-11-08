@@ -9,13 +9,10 @@ from datetime import datetime
 from pathlib import Path
 from PIL import ImageGrab
 
-app_version = "231107.1"
-
-pub_version = "0.1.dev3"
+pub_version = "0.1.dev4"
 
 app_title = (
-    "scapr - Screen Capture utility - version "
-    f"{pub_version} (mod {app_version})"
+    f"scapr - Screen Capture utility - version {pub_version}"
 )
 
 AppOptions = namedtuple(
@@ -86,7 +83,11 @@ def get_opts(argv):
     args = get_args(argv)
 
     if args.output_dir is None:
-        out_path = Path.cwd()
+        out_path = Path.home() / "Pictures" / "Screenshots"
+        if not out_path.exists():
+            out_path = Path.home() / "Pictures"
+            if not out_path.exists():
+                out_path = Path.cwd()
     else:
         out_path = Path(args.output_dir).expanduser().resolve()
         if not (out_path.exists() and out_path.is_dir()):

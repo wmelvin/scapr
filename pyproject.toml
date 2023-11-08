@@ -17,7 +17,7 @@ dependencies = ["pillow"]
 scapr = "scapr:scap.main"
 
 [project.urls]
-Home = "https://github.com/wmelvin/scapr"
+Repository = "https://github.com/wmelvin/scapr"
 
 [project.optional-dependencies]
 test = ["pytest"]
