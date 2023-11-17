@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 import sys
 import time
 
@@ -9,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from PIL import ImageGrab
 
-pub_version = "0.1.dev4"
+pub_version = "0.1.dev5"
 
 app_title = (
     f"scapr - Screen Capture utility - version {pub_version}"
@@ -132,8 +133,42 @@ def get_opts(argv):
     return opts
 
 
+def check_display_server():
+    if "XDG_SESSION_TYPE" in os.environ:
+        if os.environ["XDG_SESSION_TYPE"] == "x11":
+            return "X"
+        elif os.environ["XDG_SESSION_TYPE"] == "wayland":
+            return "Wayland"
+    else:
+        return "Unknown"
+
+
+def has_gnome_screenshot():
+    if Path("/usr/bin/gnome-screenshot").exists():
+        return True
+    else:
+        return False
+
+
 def main():
     print(f"\n{app_title}")
+
+    if check_display_server() == "Wayland" and not has_gnome_screenshot():
+        print(
+            """
+            It appears the display server is Wayland and gnome-screenshot
+            is not installed.
+
+            ImageGrab cannot directly capture screenshots on Wayland.
+            It will try to use gnome-screenshot to capture screenshots,
+            but that is not ideal because it causes a flash with each
+            screenshot.
+
+            If your system is using Gnome and Wayland, you can try installing
+            'gnome-screenshot' using your system's package manager.
+            """
+        )
+        return 1
 
     opts = get_opts(sys.argv)
 
@@ -173,7 +208,15 @@ def main():
         try:
             dt = datetime.now().strftime("%y%m%d_%H%M%S")
             save_path = opts.out_path / f"screenshot-{dt}.jpg"
+            
             img = ImageGrab.grab(opts.region)
+
+            #  If ImageGrab.grab() uses gnome-screenshot (a work-around for
+            #  Wayland), it will return a PIL.Image.Image object with mode 
+            # "RGBA". Convert to "RGB" to avoid an error when saving as JPEG.
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            
             img.save(save_path)
             time.sleep(opts.sleep_seconds)
 
