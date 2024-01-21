@@ -1,6 +1,0 @@
-flit
-pillow
-pytest
-rich
-#ruff
-#tox

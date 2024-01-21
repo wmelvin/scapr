@@ -3,23 +3,26 @@
 import argparse
 import sys
 import time
-
-from collections import namedtuple
 from datetime import datetime
 from pathlib import Path
+from typing import NamedTuple
+
 from PIL import ImageGrab
 from rich import print
 
-
-pub_version = "0.1.dev6"
+__version__ = "2024.01.1"
 
 app_title = (
-    f"scapr - Screen Capture utility - version {pub_version}"
+    f"scapr - Screen Capture utility (v{__version__})"
 )
 
-AppOptions = namedtuple(
-    "AppOptions", "out_path, sleep_seconds, stop_count, auto, region"
-)
+class AppOptions(NamedTuple):
+    out_path: Path
+    sleep_seconds: int
+    stop_count: int
+    auto: bool
+    region: tuple
+
 
 DEFAULT_SECONDS = 3
 
@@ -28,7 +31,7 @@ MAX_SECONDS = 60 * 60
 #  to be useful.
 
 
-def get_args(argv):
+def get_args(arglist=None):
     ap = argparse.ArgumentParser(
         description="Command-line utility to capture screenshots."
     )
@@ -78,11 +81,11 @@ def get_args(argv):
         "500 x 500 image starting at 100 pixels from top and left.",
     )
 
-    return ap.parse_args(argv[1:])
+    return ap.parse_args(arglist)
 
 
-def get_opts(argv):
-    args = get_args(argv)
+def get_opts(arglist=None):  # noqa: PLR0912
+    args = get_args(arglist)
 
     if args.output_dir is None:
         out_path = Path.home() / "Pictures" / "Screenshots"
@@ -100,14 +103,15 @@ def get_opts(argv):
         sleep_seconds = DEFAULT_SECONDS
     else:
         sleep_seconds = args.sleep_sec
-        if sleep_seconds < 1 or MAX_SECONDS < sleep_seconds:
+        if sleep_seconds < 1 or sleep_seconds > MAX_SECONDS:
             sleep_seconds = DEFAULT_SECONDS
 
     region = None
     if args.region_box is not None:
         reg_err = ""
         a = args.region_box.split(",")
-        if len(a) == 4:
+        expect_n_items = 4
+        if len(a) == expect_n_items:
             b = [int(s.strip()) for s in a]
             if (b[2] < b[0]) or (b[3] < b[1]):
                 reg_err = (
@@ -120,24 +124,23 @@ def get_opts(argv):
                 "Expecting four integers separated by commas (no spaces)."
             )
 
-        if 0 < len(reg_err):
+        if len(reg_err) > 0:
             sys.stderr.write(
                 f"\nERROR: Invalid region coordinates '{args.region_box}'.\n"
             )
             sys.stderr.write(f"{reg_err}\n")
             sys.exit(1)
 
-    opts = AppOptions(
+    return AppOptions(
         out_path, sleep_seconds, args.stop_count, args.auto, region
     )
 
-    return opts
 
 
-def main():
+def main(arglist=None):  # noqa: PLR0912
     print(f"\n{app_title}")
 
-    opts = get_opts(sys.argv)
+    opts = get_opts(arglist)
 
     print('  Run "scap.py -h" (or --help) to see available options.\n')
 
@@ -161,10 +164,7 @@ def main():
             sys.exit(0)
 
     while counter != 0:
-        if 0 < counter:
-            remaining = f" ({counter} remaining)"
-        else:
-            remaining = ""
+        remaining = f" ({counter} remaining)" if counter > 0 else ""
 
         print(
             f"\nCapturing screen{remaining}. Press [Ctrl]+[C] to stop.\n"
@@ -175,7 +175,7 @@ def main():
         try:
             dt = datetime.now().strftime("%y%m%d_%H%M%S")
             save_path = opts.out_path / f"screenshot-{dt}.jpg"
-            
+
             try:
                 img = ImageGrab.grab(opts.region)
             except OSError:
@@ -191,17 +191,18 @@ def main():
                 return 1
 
             #  If ImageGrab.grab() uses gnome-screenshot (a work-around for
-            #  Wayland), it will return a PIL.Image.Image object with mode 
+            #  Wayland), it will return a PIL.Image.Image object with mode
             # "RGBA". Convert to "RGB" to avoid an error when saving as JPEG.
             if img.mode != "RGB":
                 img = img.convert("RGB")
-            
+
             img.save(save_path)
             time.sleep(opts.sleep_seconds)
 
         except KeyboardInterrupt:
             print("\n\nStopped.\n")
             return 0
+    return None
 
 
 if __name__ == "__main__":
