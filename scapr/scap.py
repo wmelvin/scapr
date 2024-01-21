@@ -10,7 +10,7 @@ from typing import NamedTuple
 from PIL import ImageGrab
 from rich import print
 
-__version__ = "2024.01.1"
+__version__ = "2024.01.2"
 
 app_title = f"scapr - Screen Capture utility (v{__version__})"
 
@@ -169,7 +169,7 @@ def main(arglist=None):  # noqa: PLR0912
         session_out_path = opts.out_path
     else:
         session_dt = datetime.now().strftime("%Y%m%d_%H%M%S")
-        session_out_path = opts.out_path / session_dt
+        session_out_path = opts.out_path / f"scapr-{session_dt}"
         if not session_out_path.exists():
             session_out_path.mkdir()
 
