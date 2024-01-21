@@ -12,9 +12,8 @@ from rich import print
 
 __version__ = "2024.01.1"
 
-app_title = (
-    f"scapr - Screen Capture utility (v{__version__})"
-)
+app_title = f"scapr - Screen Capture utility (v{__version__})"
+
 
 class AppOptions(NamedTuple):
     out_path: Path
@@ -22,6 +21,7 @@ class AppOptions(NamedTuple):
     stop_count: int
     auto: bool
     region: tuple
+    do_flat: bool = False
 
 
 DEFAULT_SECONDS = 3
@@ -40,8 +40,7 @@ def get_args(arglist=None):
         "--auto",
         dest="auto",
         action="store_true",
-        help="Do not prompt to start capturing screenshots. "
-        "Begin right away.",
+        help="Do not prompt to start capturing screenshots. Begin right away.",
     )
 
     ap.add_argument(
@@ -81,6 +80,14 @@ def get_args(arglist=None):
         "500 x 500 image starting at 100 pixels from top and left.",
     )
 
+    ap.add_argument(
+        "--flat",
+        dest="do_flat",
+        action="store_true",
+        help="Do not create a sub-folder for each capture session "
+        "(a 'flat' output folder structure).",
+    )
+
     return ap.parse_args(arglist)
 
 
@@ -114,15 +121,11 @@ def get_opts(arglist=None):  # noqa: PLR0912
         if len(a) == expect_n_items:
             b = [int(s.strip()) for s in a]
             if (b[2] < b[0]) or (b[3] < b[1]):
-                reg_err = (
-                    "x2 and y2 must be greater than x1 and y1 respectively."
-                )
+                reg_err = "x2 and y2 must be greater than x1 and y1 respectively."
             else:
                 region = (b[0], b[1], b[2], b[3])
         else:
-            reg_err = (
-                "Expecting four integers separated by commas (no spaces)."
-            )
+            reg_err = "Expecting four integers separated by commas (no spaces)."
 
         if len(reg_err) > 0:
             sys.stderr.write(
@@ -132,9 +135,8 @@ def get_opts(arglist=None):  # noqa: PLR0912
             sys.exit(1)
 
     return AppOptions(
-        out_path, sleep_seconds, args.stop_count, args.auto, region
+        out_path, sleep_seconds, args.stop_count, args.auto, region, args.do_flat
     )
-
 
 
 def main(arglist=None):  # noqa: PLR0912
@@ -163,18 +165,24 @@ def main(arglist=None):  # noqa: PLR0912
         if answer.lower() not in ["y", ""]:
             sys.exit(0)
 
+    if opts.do_flat:
+        session_out_path = opts.out_path
+    else:
+        session_dt = datetime.now().strftime("%Y%m%d_%H%M%S")
+        session_out_path = opts.out_path / session_dt
+        if not session_out_path.exists():
+            session_out_path.mkdir()
+
     while counter != 0:
         remaining = f" ({counter} remaining)" if counter > 0 else ""
 
-        print(
-            f"\nCapturing screen{remaining}. Press [Ctrl]+[C] to stop.\n"
-        )
+        print(f"\nCapturing screen{remaining}. Press [Ctrl]+[C] to stop.\n")
 
         counter -= 1
 
         try:
             dt = datetime.now().strftime("%y%m%d_%H%M%S")
-            save_path = opts.out_path / f"screenshot-{dt}.jpg"
+            save_path = session_out_path / f"screenshot-{dt}.jpg"
 
             try:
                 img = ImageGrab.grab(opts.region)
