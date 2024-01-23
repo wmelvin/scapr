@@ -1,3 +1,3 @@
-from .scap import main
+import scap
 
-main()
+scap.main()
