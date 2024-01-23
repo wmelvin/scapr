@@ -1,30 +1,30 @@
 @default:
   @just --list
 
+# test, lint, check, flit build
 @build: test lint check
-  echo 'Run flit build'
   pipenv run flit build
 
+# Check formatting with ruff
 @check:
-  echo 'Run ruff format --check'
   pipenv run ruff format --check
 
+# Clean up dist folder
 @clean:
   rm dist/*
-  rmdir dist
 
+# Apply ruff formatting
 @format:
-  echo 'Run ruff format'
   pipenv run ruff format
 
+# Chcek linting with ruff
 @lint:
-  echo 'Run ruff check'
   pipenv run ruff check
 
+# Run pytest
 @test:
-  echo 'Run pytest'
   pipenv run pytest
 
+# Build and publish using flit
 @publish: build
-  echo 'Run flit publish'
   pipenv run flit publish
