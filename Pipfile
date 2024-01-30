@@ -11,6 +11,3 @@ rich = "*"
 flit = "*"
 pytest = "*"
 ruff = "*"
-
-[requires]
-python_version = "3.11"
