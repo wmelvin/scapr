@@ -10,7 +10,7 @@ from typing import NamedTuple
 from PIL import ImageGrab
 from rich import print
 
-__version__ = "2024.01.4"
+__version__ = "2024.01.5"
 
 app_title = f"scapr - Screen Capture utility (v{__version__})"
 

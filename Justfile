@@ -1,13 +1,17 @@
 @default:
   @just --list
 
-# test, lint, check, flit build
+# Run test, lint, check, flit build
 @build: test lint check
   pipenv run flit build
 
 # Check formatting with ruff
 @check:
   pipenv run ruff format --check
+
+# Run test, lint, check, then pipenv check
+@checks: test lint check
+  pipenv check
 
 # Clean up dist folder
 @clean:

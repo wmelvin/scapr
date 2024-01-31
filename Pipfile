@@ -9,5 +9,5 @@ rich = "*"
 
 [dev-packages]
 flit = "*"
-pytest = "*"
 ruff = "*"
+pytest = "*"
