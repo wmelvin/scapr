@@ -28,9 +28,9 @@ def test_capture_to_output_dir(tmp_path):
     assert len(out_dirs) == 1, "Should have one folder"
 
     out_subdir = out_dirs[0]
-    assert match(
-        r"scapr_\d{8}_\d{6}", out_subdir.name
-    ), "Folder name should match 'scapr_yyyymmdd_hhmmss` pattern"
+    assert match(r"scapr_\d{8}_\d{6}", out_subdir.name), (
+        "Folder name should match 'scapr_yyyymmdd_hhmmss` pattern"
+    )
     assert len(list(out_subdir.glob("*.jpg"))) == 2, "Should have two .jpg files"
 
 

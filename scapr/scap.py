@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import NamedTuple
 
 from PIL import ImageGrab
-from rich import print
+from rich import print as rprint
 
-__version__ = "2024.01.5"
+__version__ = "2025.05.1"
 
 app_title = f"scapr - Screen Capture utility (v{__version__})"
 
@@ -140,25 +140,25 @@ def get_opts(arglist=None):  # noqa: PLR0912
 
 
 def main(arglist=None):  # noqa: PLR0912
-    print(f"\n{app_title}")
+    rprint(f"\n{app_title}")
 
     opts = get_opts(arglist)
 
-    print('  Run "scap.py -h" (or --help) to see available options.\n')
+    rprint('  Run "scap.py -h" (or --help) to see available options.\n')
 
     if opts.region is None:
-        print("Capture full screen.")
+        rprint("Capture full screen.")
     else:
-        print(f"Capture screen region {opts.region}.")
+        rprint(f"Capture screen region {opts.region}.")
 
     if opts.stop_count is None:
         counter = -1
     else:
         counter = opts.stop_count
-        print(f"Number of screenshots to take is {counter}.")
+        rprint(f"Number of screenshots to take is {counter}.")
 
-    print(f"Number of seconds between screenshots is {opts.sleep_seconds}.")
-    print(f"Screenshots will be saved to '{opts.out_path}'.")
+    rprint(f"Number of seconds between screenshots is {opts.sleep_seconds}.")
+    rprint(f"Screenshots will be saved to '{opts.out_path}'.")
 
     if not opts.auto:
         answer = input("\nContinue [Y,n]? ")
@@ -176,7 +176,7 @@ def main(arglist=None):  # noqa: PLR0912
     while counter != 0:
         remaining = f" ({counter} remaining)" if counter > 0 else ""
 
-        print(f"\nCapturing screen{remaining}. Press [Ctrl]+[C] to stop.\n")
+        rprint(f"\nCapturing screen{remaining}. Press [Ctrl]+[C] to stop.\n")
 
         counter -= 1
 
@@ -187,7 +187,7 @@ def main(arglist=None):  # noqa: PLR0912
             try:
                 img = ImageGrab.grab(opts.region)
             except OSError:
-                print(
+                rprint(
                     "[red]ERROR: Failed to capture image.[/red]\n\nIf "
                     "running on Ubuntu, installing gnome-screenshot may fix "
                     "this problem.\n\n"
@@ -208,7 +208,7 @@ def main(arglist=None):  # noqa: PLR0912
             time.sleep(opts.sleep_seconds)
 
         except KeyboardInterrupt:
-            print("\n\nStopped.\n")
+            rprint("\n\nStopped.\n")
             return 0
     return None
 
