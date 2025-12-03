@@ -10,7 +10,8 @@ from typing import NamedTuple
 from PIL import ImageGrab
 from rich import print as rprint
 
-__version__ = "2025.05.1"
+#  Using calver (YYYY.0M.MICRO).
+__version__ = "2025.12.1"
 
 app_title = f"scapr - Screen Capture utility (v{__version__})"
 
