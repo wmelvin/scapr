@@ -10,7 +10,7 @@ A script that uses Pillow's ImageGrab to capture screenshots.
 
 ```shell
 usage: scapr [-h] [--auto] [--seconds SLEEP_SEC] [--count STOP_COUNT]
-             [--folder OUTPUT_DIR] [--region REGION_BOX] [--flat]
+             [--folder OUTPUT_DIR] [--region REGION_BOX] [--flat] [--do-log]
 
 Command-line utility to capture screenshots.
 
@@ -30,6 +30,8 @@ options:
                        top and left.
   --flat               Do not create a sub-folder for each capture session (a
                        'flat' output folder structure).
+  --do-log             Optional. Write a text log file to the same folder as
+                       the screenshots.
 ```
 
 ## Reference
