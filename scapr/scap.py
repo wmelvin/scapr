@@ -11,7 +11,7 @@ from PIL import ImageGrab
 from rich import print as rprint
 
 #  Using calver (YYYY.0M.MICRO).
-__version__ = "2025.12.1"
+__version__ = "2025.12.2"
 
 app_title = f"scapr - Screen Capture utility (v{__version__})"
 
@@ -23,6 +23,7 @@ class AppOptions(NamedTuple):
     auto: bool
     region: tuple
     do_flat: bool = False
+    do_log: bool = False
 
 
 DEFAULT_SECONDS = 3
@@ -89,6 +90,13 @@ def get_args(arglist=None):
         "(a 'flat' output folder structure).",
     )
 
+    ap.add_argument(
+        "--do-log",
+        dest="do_log",
+        action="store_true",
+        help="Optional. Write a text log file to the same folder as the screenshots.",
+    )
+
     return ap.parse_args(arglist)
 
 
@@ -136,21 +144,51 @@ def get_opts(arglist=None):  # noqa: PLR0912
             sys.exit(1)
 
     return AppOptions(
-        out_path, sleep_seconds, args.stop_count, args.auto, region, args.do_flat
+        out_path,
+        sleep_seconds,
+        args.stop_count,
+        args.auto,
+        region,
+        args.do_flat,
+        args.do_log,
     )
 
 
+def write_log(log_file: Path | None, msg: str) -> None:
+    if log_file:
+        msg = f"[{datetime.now():%Y%m%d_%H%M%S_%f}] {msg}"
+        with log_file.open("a") as f:
+            f.write(f"{msg}\n")
+
+
+def print_log(log_file: Path | None, msg: str) -> None:
+    rprint(msg)
+    write_log(log_file, msg)
+
+
 def main(arglist=None):  # noqa: PLR0912
-    rprint(f"\n{app_title}")
+    rprint(f"\n{app_title}\n")
 
     opts = get_opts(arglist)
 
     rprint('  Run "scap.py -h" (or --help) to see available options.\n')
 
-    if opts.region is None:
-        rprint("Capture full screen.")
+    if opts.do_flat:
+        session_out_path = opts.out_path
     else:
-        rprint(f"Capture screen region {opts.region}.")
+        session_dt = datetime.now().strftime("%Y%m%d_%H%M%S")
+        session_out_path = opts.out_path / f"scapr_{session_dt}"
+        if not session_out_path.exists():
+            session_out_path.mkdir()
+
+    log_file = session_out_path / "scapr-log.txt" if opts.do_log else None
+
+    write_log(log_file, app_title)
+
+    if opts.region is None:
+        print_log(log_file, "Capture full screen.")
+    else:
+        print_log(log_file, f"Capture screen region {opts.region}.")
 
     if opts.stop_count is None:
         counter = -1
@@ -165,14 +203,6 @@ def main(arglist=None):  # noqa: PLR0912
         answer = input("\nContinue [Y,n]? ")
         if answer.lower() not in ["y", ""]:
             sys.exit(0)
-
-    if opts.do_flat:
-        session_out_path = opts.out_path
-    else:
-        session_dt = datetime.now().strftime("%Y%m%d_%H%M%S")
-        session_out_path = opts.out_path / f"scapr_{session_dt}"
-        if not session_out_path.exists():
-            session_out_path.mkdir()
 
     while counter != 0:
         remaining = f" ({counter} remaining)" if counter > 0 else ""
@@ -197,6 +227,7 @@ def main(arglist=None):  # noqa: PLR0912
                     "screen flash and shutter-click sound with each "
                     "screenshot.\n"
                 )
+                write_log(log_file, "Failed to capture image.")
                 return 1
 
             #  If ImageGrab.grab() uses gnome-screenshot (a work-around for
@@ -205,6 +236,7 @@ def main(arglist=None):  # noqa: PLR0912
             if img.mode != "RGB":
                 img = img.convert("RGB")
 
+            write_log(log_file, f"Save '{save_path}'")
             img.save(save_path)
             time.sleep(opts.sleep_seconds)
 
