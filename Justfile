@@ -2,7 +2,7 @@
   @just --list
 
 # Run test, lint, check, flit build
-@build: test lint check
+@build: lint check test
   uv run flit build
 
 # Check formatting with ruff
@@ -10,7 +10,7 @@
   uv run ruff format --check
 
 # Run test, lint, check
-@checks: test lint check
+@checks: lint check test
 
 # Clean up dist folder
 @clean:

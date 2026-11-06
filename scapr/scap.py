@@ -11,7 +11,7 @@ from PIL import ImageGrab
 from rich import print as rprint
 
 #  Using calver (YYYY.0M.MICRO).
-__version__ = "2025.12.2"
+__version__ = "2026.11.1"
 
 app_title = f"scapr - Screen Capture utility (v{__version__})"
 
@@ -212,8 +212,8 @@ def main(arglist=None):  # noqa: PLR0912
         counter -= 1
 
         try:
-            dt = datetime.now().strftime("%y%m%d_%H%M%S")
-            save_path = session_out_path / f"screenshot-{dt}.jpg"
+            dt = datetime.now().strftime("%Y%m%d_%H%M%S")
+            save_path = session_out_path / f"screen_{dt}.jpg"
 
             try:
                 img = ImageGrab.grab(opts.region)

@@ -58,7 +58,12 @@ def test_capture_to_output_dir_with_log(tmp_path):
     assert match(r"scapr_\d{8}_\d{6}", out_subdir.name), (
         "Folder name should match 'scapr_yyyymmdd_hhmmss` pattern"
     )
-    assert len(list(out_subdir.glob("*.jpg"))) == 2, "Should have two .jpg files"
+
+    jpg_files = list(out_subdir.glob("*.jpg"))
+    assert len(jpg_files) == 2, "Should have two .jpg files"
+    assert match(r"screen_\d{8}_\d{6}.jpg", jpg_files[0].name), (
+        "File name should match 'screen_yyyymmdd_hhmmss` pattern"
+    )
 
     assert len(list(out_subdir.glob("*-log.txt"))) == 1, "Should have one log file"
 
