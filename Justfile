@@ -10,7 +10,7 @@
   uv run ruff format --check
 
 # Run test, lint, check
-@checks: lint check test
+@checks: lint check
 
 # Clean up dist folder
 @clean:

@@ -11,7 +11,7 @@ from PIL import ImageGrab
 from rich import print as rprint
 
 #  Using calver (YYYY.0M.MICRO).
-__version__ = "2026.11.1"
+__version__ = "2026.11.2"
 
 app_title = f"scapr - Screen Capture utility (v{__version__})"
 
